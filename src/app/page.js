@@ -8,10 +8,12 @@ import { auth } from "../firebase/firebase";
 import { useDispatch } from "react-redux";
 import { loginUser } from "@/features/auth/auth.slice";
 import { toast } from "react-toastify";
-import ReduxProvider from "@/store/redux-provider";
+import { redirect } from "next/navigation";
 
 export default function Home() {
+
   const dispatch = useDispatch();
+
   function googleAuthentication() {
     console.log(process.env.NEXT_PUBLIC_FIREBASE_API_KEY);
 
@@ -29,8 +31,12 @@ export default function Home() {
               avatar: result.user.photoURL,
             })
           );
-          // navigate("/home");
+          redirect("/home");
+        } else {
         }
+        toast.error("Failed  signup!", {
+          position: "top-center",
+        });
       });
     } catch (error) {
       toast.error("Failed  signup!", {
@@ -40,7 +46,7 @@ export default function Home() {
   }
 
   return (
-
+    <Box className={style.container}>
       <Box className={style["login-container"]}>
         <Box className={style["left-container"]}>
           <Typography
@@ -79,5 +85,6 @@ export default function Home() {
           </Box>
         </Box>
       </Box>
+    </Box>
   );
 }

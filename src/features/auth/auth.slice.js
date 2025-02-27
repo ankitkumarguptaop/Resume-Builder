@@ -1,4 +1,5 @@
 import { createSlice } from "@reduxjs/toolkit";
+import { redirect } from "next/navigation";
 
 const initialState = {
   users: [],
@@ -22,6 +23,7 @@ export const authUserSlice = createSlice({
     },
     logout: (state, action) => {
       state.currentUser = null;
+      redirect("/")
     },
   },
   extraReducers: (builder) => {},

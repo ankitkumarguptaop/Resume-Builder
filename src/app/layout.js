@@ -24,10 +24,8 @@ export default function RootLayout({ children }) {
     <html lang="en">
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      > 
-      <ReduxProvider>
-        <Box className={style.container}>{children}</Box>
-        </ReduxProvider>
+      >
+        <ReduxProvider>{children}</ReduxProvider>
       </body>
     </html>
   );
