@@ -1,0 +1,45 @@
+.template {
+  margin: 5px;
+  height: 82vh;
+  width: 697px;
+  border: 1px solid black;
+  padding: 10px;
+  display: flex;
+}
+
+.left-template {
+  position: relative;
+  width: 40%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.right-template {
+  padding-left: 30px;
+  width: 60%;
+  height: 100%;
+}
+.profile {
+  z-index: 1;
+  margin: 5px;
+  height: 266px;
+  width: 266px;
+  border: 5px solid rgb(51, 49, 50);
+  outline: 8px solid white;
+  border-radius: 50%;
+  background-color: #ffff;
+  background-image: url("../../assets/images/dummy-profile.jpg");
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: 300px 300px;
+}
+
+.personal-information {
+  position: absolute;
+  top: 130px;
+  height: 595px;
+  width: 100%;
+  background: rgb(51, 49, 50);
+}

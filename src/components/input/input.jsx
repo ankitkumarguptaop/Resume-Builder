@@ -25,10 +25,12 @@ const Input = ({ lable, width, register, feildName, errors, displayFeild }) => {
           }}
         ></TextField>
       </Box>
+      <Box width={"50%"} >
       <Box >
       {errors[feildName] && (
         <p style={{ color: "red" }}>{errors[feildName].message}</p>
       )}
+      </Box>
       </Box>
     </>
   );

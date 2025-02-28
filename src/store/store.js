@@ -1,6 +1,7 @@
 import { configureStore } from "@reduxjs/toolkit";
 
 import authReducer from "../features/auth/auth.slice";
+import resumeReducer from "../features/resume/resume.slice"
 
 import storage from "redux-persist/lib/storage";
 import { persistStore, persistReducer } from "redux-persist";
@@ -18,6 +19,7 @@ export const persistedAuthReducer = persistReducer(
 export const store = configureStore({
   reducer: {
     auth: persistedAuthReducer,
+    resume: resumeReducer
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({

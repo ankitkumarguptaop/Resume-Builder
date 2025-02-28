@@ -1,18 +1,23 @@
 "use client";
+import React, { useState } from "react";
 import { Box, Button, FormControl, TextField, Typography } from "@mui/material";
-import React from "react";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Input from "@/components/input/input";
 import { useForm, useFieldArray } from "react-hook-form";
 import style from "./form.module.css";
 import { redirect } from "next/navigation";
-import app from "@/firebase/firebase";
+import { useDispatch, useSelector } from "react-redux";
+import { createResumes, setCurrentResumeDetails } from "@/features/resume/resume.slice";
+
 const Form = () => {
+  const dispatch = useDispatch();
+
+  const [templateType, setTemplateType] = useState(1);
   const educationInfoSchema = z.object({
-    institutionName: z.string(),
-    cgpa: z.string(),
-    passingYear: z.string(),
+    institutionName: z.string("Institution Name is Required"),
+    cgpa: z.string("CGPA is Required"),
+    passingYear: z.string("Passing Year is Required"),
   });
 
   const formSchema = z.object({
@@ -24,16 +29,14 @@ const Form = () => {
     project2: z.string().min(10, "Project description is too short"),
     website: z.string().url("Enter valid url"),
     skills: z.string().min(2, "Skils are not given"),
-    educations: z.array(educationInfoSchema, "Education details not given"),
+    educations: z.array(educationInfoSchema),
   });
 
   const {
     control,
-    getValues,
-    setError,
     register,
-    formState: { errors },
     handleSubmit,
+    formState: { errors, isValid },
     reset,
   } = useForm({
     resolver: zodResolver(formSchema),
@@ -46,22 +49,26 @@ const Form = () => {
       project1: "",
       project2: "",
       introduction: "",
-      eductaions: [{ institutionName: "", cgpa: "", passingYear: "" }],
+      educations: [{ institutionName: "", cgpa: "", passingYear: "" }],
     },
   });
 
-  const { fields, append } = useFieldArray({
+  const { fields, append, remove } = useFieldArray({
     name: "educations",
     control,
   });
 
-  console.log("✌️fields --->", fields);
-  const onSubmit = (data) => {
-    console.log("jgbfhedb");
-
+  const onSubmit = async(data) => {
+    dispatch(createResumes({ data , type: templateType }));
+    dispatch(setCurrentResumeDetails({ data , type: templateType }));
+    console.log(data);
     reset();
+    redirect("/home")
   };
-
+  const currentResume = useSelector(
+    (state) => state.resume.currentResumeDetails
+  );
+  console.log("✌️currentResume --->", currentResume);
   return (
     <Box className={style["form-container"]}>
       <Typography sx={{ margin: "10px 0px" }} variant="h3">
@@ -108,36 +115,79 @@ const Form = () => {
           register={register}
           feildName={"website"}
           errors={errors}
-          displayFeild="Enter your website url"
+          displayFeild="Enter your Website URl"
+        ></Input>
+        <Input
+          lable="Project 1"
+          width="300px"
+          register={register}
+          feildName={"project1"}
+          errors={errors}
+          displayFeild="Enter your Project 1 Description"
+        ></Input>
+        <Input
+          lable="Project 2"
+          width="300px"
+          register={register}
+          feildName={"project2"}
+          errors={errors}
+          displayFeild="Enter your Project 1 Description"
+        ></Input>
+        <Input
+          lable="Skills"
+          width="300px"
+          register={register}
+          feildName={"skills"}
+          errors={errors}
+          displayFeild="Enter your Skills"
         ></Input>
         <Box>
           {fields.map((feild, index) => (
-            <Box key={feild.id}>
-              <TextField
-              
-                lable={"institutionName"}
-                {...register(`institutionName`, {
-                  required: {
-                    value: true,
-                    message: `institutionName Required `,
-                  },
-                })}
-              ></TextField>
-              <TextField
-                lable={"Cgpa"}
-                {...register(`eductaions.Cgpa.${index}`, {
-                  required: { value: true, message: ` Cgpa Required ` },
-                })}
-              ></TextField>
-              <TextField
-                {...register(`eductaions.passingYear.${index}`, {
-                  required: { value: true, message: `passingYear Required ` },
-                })}
-                lable={"passingYear"}
-              ></TextField>
+            <Box
+              key={feild.id}
+              display={"flex"}
+              flexDirection={"column"}
+              alignItems={"flex-end"}
+            >
+              <Typography variant="h6">
+                Education Details {index + 1}
+              </Typography>
+              <Input
+                lable="Institution Name"
+                width="300px"
+                register={register}
+                feildName={`educations.${index}.institutionName`}
+                errors={errors}
+                displayFeild="Enter your Institution Name "
+              ></Input>
+              <Input
+                lable="CGPA"
+                width="300px"
+                register={register}
+                feildName={`educations.${index}.cgpa`}
+                errors={errors}
+                displayFeild="Enter your CGPA"
+              ></Input>
+              <Input
+                lable="Pass Year"
+                width="300px"
+                register={register}
+                feildName={`educations.${index}.passingYear`}
+                errors={errors}
+                displayFeild="Enter your Passing Year"
+              ></Input>
+              <Box sx={{ width: "90%" }}>
+                <Button
+                  onClick={() => remove(index)}
+                  sx={{ backgroundColor: "red", color: "white" }}
+                >
+                  Remove
+                </Button>
+              </Box>
             </Box>
           ))}
         </Box>
+
         <Button
           variant="contained"
           onClick={() => {

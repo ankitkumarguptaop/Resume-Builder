@@ -10,6 +10,7 @@ export default function HomeLayout({ children }) {
   function handleLogout() {
     dispatch(logout());
   }
+  
   return (
     <>
       <Box className={style["navbar"]}>
