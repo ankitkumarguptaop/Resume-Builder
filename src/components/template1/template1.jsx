@@ -10,7 +10,6 @@ import SchoolIcon from "@mui/icons-material/School";
 import EngineeringIcon from "@mui/icons-material/Engineering";
 const Template1 = ({ data }) => {
 
-
   return (
     <Box className={style.template}>
       <Box className={style["left-template"]}>
@@ -141,7 +140,7 @@ const Template1 = ({ data }) => {
         <Typography variant="h2" sx={{ fontWeight: "bold" }}>
           {data?.name}
         </Typography>
-        <Typography variant="h6">Graphics Designer </Typography>
+        <Typography sx={{marginTop: "20px"}} variant="h6">Graphics Designer </Typography>
         <Box sx={{ display: "flex", marginTop: "65px" }}>
           <SchoolIcon></SchoolIcon>
           <Typography

@@ -1,0 +1,98 @@
+.pageWrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin: 20px;
+  }
+  
+  .printButton {
+    margin-bottom: 15px;
+  }
+  
+  .resumeContainer {
+    width: 794px; 
+    height: 1123px; 
+    background: white;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+    font-family: "Arial", sans-serif;
+    border-radius: 8px;
+    overflow: hidden;
+  }
+  
+  /* Header */
+  .header {
+    background: #1976D2;
+    color: white;
+    text-align: center;
+    padding: 20px;
+  }
+  
+  .name {
+    font-weight: bold;
+    font-size: 24px;
+  }
+  
+  .title {
+    font-size: 16px;
+  }
+  
+  .content {
+    display: flex;
+    height: 100%;
+  }
+  
+  .leftPanel {
+    width: 35%;
+    background: #F4F6F8;
+    padding: 30px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  .section {
+    width: 100%;
+    margin-bottom: 25px;
+  }
+  
+  .sectionTitle {
+    display: flex;
+    align-items: center;
+    font-size: 18px;
+    margin-bottom: 10px;
+    font-weight: bold;
+    color: #333;
+  }
+  
+  .icon {
+    margin-right: 8px;
+    font-size: 20px;
+  }
+  
+  .skillsList {
+    padding-left: 10px;
+  }
+  
+  .skillItem {
+    font-size: 14px;
+    padding: 2px 0;
+  }
+  
+  .rightPanel {
+    width: 65%;
+    padding: 30px;
+  }
+  
+  .educationItem {
+    margin-bottom: 15px;
+  }
+  
+  .bold {
+    font-weight: bold;
+  }
+  
+  .projectItem {
+    margin-bottom: 15px;
+  }
+  
+  

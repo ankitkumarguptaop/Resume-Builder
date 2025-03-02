@@ -6,10 +6,13 @@ import Template from "@/components/template1/template1";
 import style from "./home.module.css";
 import Image from "next/image";
 import Template1Img from "../../assets/images/template1.png";
+import Template2Img from "../../assets/images/template2.jpg";
+import Template3Img from "../../assets/images/template3.jpg";
 import Template1 from "@/components/template1/template1";
 import { useSelector } from "react-redux";
 import MediaCard from "@/components/card/card";
 import { redirect } from "next/navigation";
+
 
 const Home = () => {
   const [isOpenModal, setIsOpenModal] = useState(false);
@@ -19,6 +22,7 @@ const Home = () => {
 
   const resumes = useSelector((state) => state.resume.resumes);
   console.log("✌️currentResume --->", currentResume);
+
   const modalStyle = {
     top: "50%",
     left: "50%",
@@ -78,19 +82,19 @@ const Home = () => {
             onClick={()=>redirect("home/resume-details")}
           ></Image>
           <Image
-            src={Template1Img}
+            src={Template2Img}
             alt={"template 2"}
             width={"400"}
             height={"500"}
           ></Image>
           <Image
-            src={Template1Img}
+            src={Template3Img}
             alt={"template 3"}
             width={400}
             height={500}
           ></Image>
         </Box>
-          <Button variant="contained" >close</Button>
+          <Button variant="contained" onClick={handleCloseModal} >close</Button>
         </Box>
       </Modal>
     </Box>
