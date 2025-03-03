@@ -13,11 +13,13 @@ import html2canvas from "html2canvas";
 import { Document, Page, pdfjs } from "react-pdf";
 import Template2 from "../template2/template2";
 import Link from "next/link";
+import Template3 from "../template3/template3";
 
 
 pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.min.js`;
 
 export default function MediaCard({ data }) {
+  console.log('✌️data --->', data);
   const [isOpenModal, setIsOpenModal] = useState(false);
   const [pdfUrl, setPdfUrl] = useState(null);
   const reportTemplateRef = useRef(null);
@@ -76,7 +78,6 @@ export default function MediaCard({ data }) {
     flexDirection: "column",
     alignItems: "center",
     overflow: "auto",
-    // backgroundColor:"red"
   };
 
   function handleCloseModal() {
@@ -116,7 +117,14 @@ export default function MediaCard({ data }) {
           {!pdfUrl ? (
             <>
               <Box ref={reportTemplateRef}>
-                <Template2 data={data}></Template2>
+                {data.type === 1 ? (
+                  <Template1 data={data} />
+                ) : data.type === 2 ? (
+                  <Template2 data={data} />
+                ) : (
+                  <Template3 data={data} />
+                )}
+
               </Box>
               <Button
                 variant="contained"
@@ -140,12 +148,12 @@ export default function MediaCard({ data }) {
                 Open PDF
               </Button>
               <Button
-                   onClick={() => {
-                    const link = document.createElement("a");
-                    link.href = pdfUrl;
-                    link.download = "resume.pdf";
-                    link.click();
-                  }} 
+                onClick={() => {
+                  const link = document.createElement("a");
+                  link.href = pdfUrl;
+                  link.download = "resume.pdf";
+                  link.click();
+                }}
                 variant="contained"
                 color="primary"
               >

@@ -9,19 +9,22 @@ import Template1Img from "../../assets/images/template1.png";
 import Template2Img from "../../assets/images/template2.jpg";
 import Template3Img from "../../assets/images/template3.jpg";
 import Template1 from "@/components/template1/template1";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import MediaCard from "@/components/card/card";
 import { redirect } from "next/navigation";
+import { setCurrentResumeType } from "@/features/resume/resume.slice";
 
 
 const Home = () => {
+  const dispatch = useDispatch();
+
   const [isOpenModal, setIsOpenModal] = useState(false);
   const currentResume = useSelector(
     (state) => state.resume.currentResumeDetails
   );
 
   const resumes = useSelector((state) => state.resume.resumes);
-  console.log("✌️currentResume --->", currentResume);
+  console.log("✌️currentResume --->", resumes);
 
   const modalStyle = {
     top: "50%",
@@ -79,19 +82,30 @@ const Home = () => {
             alt={"template 1"}
             width={400}
             height={500}
-            onClick={()=>redirect("home/resume-details")}
+            onClick={()=>{
+              dispatch(setCurrentResumeType(1)) 
+              redirect("home/resume-details") 
+            }}
           ></Image>
           <Image
             src={Template2Img}
             alt={"template 2"}
             width={"400"}
             height={"500"}
+            onClick={()=>{
+              dispatch(setCurrentResumeType(2)) 
+              redirect("home/resume-details") 
+            }}
           ></Image>
           <Image
             src={Template3Img}
             alt={"template 3"}
             width={400}
             height={500}
+            onClick={()=>{
+              dispatch(setCurrentResumeType(3)) 
+              redirect("home/resume-details") 
+            }}
           ></Image>
         </Box>
           <Button variant="contained" onClick={handleCloseModal} >close</Button>

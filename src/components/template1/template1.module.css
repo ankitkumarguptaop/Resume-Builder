@@ -1,10 +1,10 @@
 .template {
   margin: 10px;
-  height: 100%;
-  width: 100%;
-  /* border: 1px solid black; */
+  height: 900px; 
+  width: 1005;
   padding: 10px;
   display: flex;
+  background-color: white;
 }
 
 .left-template {
