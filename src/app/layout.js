@@ -1,3 +1,4 @@
+
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import style from "./auth.module.css";
@@ -25,7 +26,7 @@ export default function RootLayout({ children }) {
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <ReduxProvider>{children}</ReduxProvider>
+          <ReduxProvider> {children}</ReduxProvider>
       </body>
     </html>
   );

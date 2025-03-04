@@ -6,15 +6,18 @@
 }
 
 .css-4nmryk-MuiBackdrop-root-MuiModal-backdrop {
-  background-color: white !important;
-  box-shadow: rgba(100, 100, 111, 0.2) 0px 7px 29px 0px;
+  background-color: rgba(255, 255, 255, 0) !important;
   border: none !important;
 }
 
 .css-qqv389 {
   border: none !important;
-
   outline-style: "none" !important;
   outline-width: "none" !important;
   outline-color: "none" !important;
+}
+
+
+.css-14dl35y{
+  opacity: 0;
 }

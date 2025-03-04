@@ -1,6 +1,13 @@
 "use client";
 import React, { useRef, useState } from "react";
-import { Box, Button, FormControl, Modal, TextField, Typography } from "@mui/material";
+import {
+  Box,
+  Button,
+  FormControl,
+  Modal,
+  TextField,
+  Typography,
+} from "@mui/material";
 import { set, z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Input from "@/components/input/input";
@@ -8,7 +15,14 @@ import { useForm, useFieldArray } from "react-hook-form";
 import style from "./form.module.css";
 import { redirect } from "next/navigation";
 import { useDispatch, useSelector } from "react-redux";
-import { createResumes, setCurrentResumeDetails, setCurrentResumeType } from "@/features/resume/resume.slice";
+import {
+  createResumes,
+  setCurrentResumeDetails,
+  setCurrentResumeType,
+  setEditState,
+  setFormData,
+  updateResume,
+} from "@/features/resume/resume.slice";
 import Image from "next/image";
 import Template1Img from "../../../assets/images/template1.png";
 import Template2Img from "../../../assets/images/template2.jpg";
@@ -17,21 +31,21 @@ import { Document, Page, pdfjs } from "react-pdf";
 import Template1 from "@/components/template1/template1";
 import Template2 from "@/components/template2/template2";
 import Template3 from "@/components/template3/template3";
-import jsPDF from "jspdf";
-import html2canvas from "html2canvas";
+import uuid from "react-uuid";
+import { useRouter } from "next/router";
 
 pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.min.js`;
 
 const Form = () => {
   const dispatch = useDispatch();
-
+  const formData = useSelector((state) => state.resume.formData);
+  const isEditState = useSelector((state) => state.resume.isEditState);
   const currentResumeType = useSelector(
-    (state) => state.resume.currentResumeType)
-  console.log('✌️currentResumeType --->', currentResumeType);
+    (state) => state.resume.currentResumeType
+  );
 
   const [isOpenModal, setIsOpenModal] = useState(false);
   const [isOpenModal1, setIsOpenModal1] = useState(false);
-
 
   const educationInfoSchema = z.object({
     institutionName: z.string("Institution Name is Required"),
@@ -59,17 +73,7 @@ const Form = () => {
     reset,
   } = useForm({
     resolver: zodResolver(formSchema),
-    defaultValues: {
-      name: "",
-      email: "",
-      phone: "",
-      skills: "",
-      website: "",
-      project1: "",
-      project2: "",
-      introduction: "",
-      educations: [{ institutionName: "", cgpa: "", passingYear: "" }],
-    },
+    defaultValues: formData,
   });
 
   const { fields, append, remove } = useFieldArray({
@@ -78,20 +82,40 @@ const Form = () => {
   });
 
   const onSubmit = async (data) => {
-    dispatch(createResumes({ ...data, type: currentResumeType }));
-    dispatch(setCurrentResumeDetails({ ...data, type: currentResumeType }));
+    if (!isEditState) {
+      const id = uuid();
+      dispatch(createResumes({ ...data, type: currentResumeType, id: id }));
+      dispatch(
+        setCurrentResumeDetails({ ...data, type: currentResumeType, id: id })
+      );
+    } else {
+      dispatch(updateResume({ ...data, type: currentResumeType, id: formData.id}));
+      dispatch(setEditState(false));
+      
+    }
+    dispatch(
+      setFormData({
+        name: "",
+        email: "",
+        phone: "",
+        skills: "",
+        website: "",
+        project1: "",
+        project2: "",
+        introduction: "",
+        educations: [{ institutionName: "", cgpa: "", passingYear: "" }],
+     
+      })
+    );
     reset();
-    redirect("/home")
+    redirect("/home");
   };
 
   const [data, setData] = useState(null);
-  const [pdfUrl, setPdfUrl] = useState(null);
-
 
   const onPreview = async (data) => {
     setData(data);
-    console.log('✌️data --->', data);
-  }
+  };
   const reportTemplateRef = useRef(null);
 
   const modalStyle = {
@@ -130,7 +154,6 @@ const Form = () => {
   const currentResume = useSelector(
     (state) => state.resume.currentResumeDetails
   );
-  console.log("✌️currentResume --->", currentResume);
 
   function handleCloseModal() {
     setIsOpenModal(false);
@@ -139,46 +162,6 @@ const Form = () => {
   function handleCloseModal1() {
     setIsOpenModal1(false);
   }
-  const handleGeneratePdf = async () => {
-    const element = reportTemplateRef.current;
-
-    if (!element) return;
-
-    const canvas = await html2canvas(element, {
-      scale: 2,
-      useCORS: true,
-      allowTaint: true,
-      windowWidth: element.scrollWidth,
-    });
-
-    const imgData = canvas.toDataURL("image/png");
-    const pdf = new jsPDF("p", "mm", "a4");
-    const pageWidth = pdf.internal.pageSize.getWidth();
-    const pageHeight = pdf.internal.pageSize.getHeight();
-
-    const imgWidth = pageWidth;
-    const imgHeight = (canvas.height * imgWidth) / canvas.width;
-
-    if (imgHeight > pageHeight) {
-      let heightLeft = imgHeight;
-      let position = 0;
-
-      while (heightLeft > 0) {
-        pdf.addImage(imgData, "PNG", 0, position, imgWidth, imgHeight);
-        heightLeft -= pageHeight;
-        position -= pageHeight;
-
-        if (heightLeft > 0) pdf.addPage();
-      }
-    } else {
-      pdf.addImage(imgData, "PNG", 0, 0, imgWidth, imgHeight);
-    }
-
-    const pdfBlob = pdf.output("blob");
-    const pdfBlobUrl = URL.createObjectURL(pdfBlob);
-    setPdfUrl(pdfBlobUrl);
-  };
-
   return (
     <Box className={style["form-container"]}>
       <Typography sx={{ margin: "10px 0px" }} variant="h3">
@@ -313,22 +296,59 @@ const Form = () => {
             type="submit"
             onClick={handleSubmit(onSubmit)}
           >
-            Save
+            {isEditState ? "Edit" : "Save"}
           </Button>
           <Button
             sx={{ width: "100px", margin: "10px" }}
             variant="contained"
-            onClick={() => reset()}
+            onClick={() =>{
+              dispatch(
+                setFormData({
+                  name: "",
+                  email: "",
+                  phone: "",
+                  skills: "",
+                  website: "",
+                  project1: "",
+                  project2: "",
+                  introduction: "",
+                  educations: [
+                    { institutionName: "", cgpa: "", passingYear: "" },
+                  ],
+                })
+              )
+              reset();
+            }
+            }
           >
             Clear
           </Button>
-          <Button sx={{ width: "100px", margin: "10px" }} variant="contained" onClick={handleSubmit((data) => { onPreview(data); setIsOpenModal(true) })} >
+          <Button
+            sx={{ width: "100px", margin: "10px" }}
+            variant="contained"
+            onClick={handleSubmit((data) => {
+              onPreview(data);
+              setIsOpenModal(true);
+            })}
+          >
             Preview
           </Button>
           <Button
             sx={{ width: "100px", backgroundColor: "red", margin: "10px" }}
             variant="contained"
             onClick={() => {
+              dispatch(setEditState(false))
+              dispatch(setFormData({ name: "",
+                email: "",
+                phone: "",
+                skills: "",
+                website: "",
+                project1: "",
+                project2: "",
+                introduction: "",
+                educations: [
+                  { institutionName: "", cgpa: "", passingYear: "" },
+                ]}))
               redirect("/home");
             }}
           >
@@ -344,7 +364,9 @@ const Form = () => {
         aria-describedby="modal-modal-description"
       >
         <Box sx={{ outline: "none" }}>
-          <Typography sx={{ fontWeight: "bold" }}>Choose A Template </Typography>
+          <Typography sx={{ fontWeight: "bold" }}>
+            Choose A Template{" "}
+          </Typography>
           <Box className={style.template}>
             <Image
               src={Template1Img}
@@ -352,11 +374,9 @@ const Form = () => {
               width={400}
               height={500}
               onClick={() => {
-                dispatch(setCurrentResumeType(1))
-                setIsOpenModal(false)
-                setIsOpenModal1(true)
-
-
+                dispatch(setCurrentResumeType(1));
+                setIsOpenModal(false);
+                setIsOpenModal1(true);
               }}
             ></Image>
             <Image
@@ -365,10 +385,9 @@ const Form = () => {
               width={"400"}
               height={"500"}
               onClick={() => {
-                dispatch(setCurrentResumeType(2))
-                setIsOpenModal(false)
-                setIsOpenModal1(true)
-
+                dispatch(setCurrentResumeType(2));
+                setIsOpenModal(false);
+                setIsOpenModal1(true);
               }}
             ></Image>
             <Image
@@ -377,13 +396,15 @@ const Form = () => {
               width={400}
               height={500}
               onClick={() => {
-                dispatch(setCurrentResumeType(3))
-                setIsOpenModal(false)
-                setIsOpenModal1(true)
+                dispatch(setCurrentResumeType(3));
+                setIsOpenModal(false);
+                setIsOpenModal1(true);
               }}
             ></Image>
           </Box>
-          <Button variant="contained" onClick={handleCloseModal} >close</Button>
+          <Button variant="contained" onClick={handleCloseModal}>
+            close
+          </Button>
         </Box>
       </Modal>
       <Modal
@@ -393,56 +414,22 @@ const Form = () => {
         aria-labelledby="modal-modal-title"
         aria-describedby="modal-modal-description"
       >
-        <Box >
-          {!pdfUrl ? (
-            <>
-              <Box ref={reportTemplateRef}>
-                {currentResumeType === 1 ? (
-                  <Template1 data={data} />
-                ) : currentResumeType === 2 ? (
-                  <Template2 data={data} />
-                ) : (
-                  <Template3 data={data} />
-                )}
+        <Box>
+          <Box ref={reportTemplateRef}>
+            {currentResumeType === 1 ? (
+              <Template1 data={data} />
+            ) : currentResumeType === 2 ? (
+              <Template2 data={data} />
+            ) : (
+              <Template3 data={data} />
+            )}
+          </Box>
 
-              </Box>
-              <Button
-                variant="contained"
-                sx={{ color: "white", margin: "10px" }}
-                onClick={handleGeneratePdf}
-              >
-                Generate PDF Preview
-              </Button>
-            </>
-          ) : (
-            <>
-              <Typography variant="h6">PDF Preview</Typography>
-              <Document file={pdfUrl}>
-                <Page pageNumber={1} />
-              </Document>
-              <Button
-                variant="contained"
-                sx={{ color: "white", margin: "10px" }}
-                onClick={() => window.open(pdfUrl, "_blank")}
-              >
-                Open PDF
-              </Button>
-              <Button
-                onClick={() => {
-                  const link = document.createElement("a");
-                  link.href = pdfUrl;
-                  link.download = "resume.pdf";
-                  link.click();
-                }}
-                variant="contained"
-                color="primary"
-              >
-                Download PDF
-              </Button>
-
-            </>
-          )}
-          <Button variant="contained" sx={{ color: "white", margin: "10px" }} onClick={handleCloseModal1}>
+          <Button
+            variant="contained"
+            sx={{ color: "white", margin: "10px" }}
+            onClick={handleCloseModal1}
+          >
             Close
           </Button>
         </Box>

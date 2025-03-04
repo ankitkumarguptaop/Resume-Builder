@@ -6,21 +6,28 @@ import CardContent from "@mui/material/CardContent";
 import CardMedia from "@mui/material/CardMedia";
 import Button from "@mui/material/Button";
 import Typography from "@mui/material/Typography";
-import { Box, Modal } from "@mui/material";
+import { Box, Modal, Snackbar } from "@mui/material";
 import Template1 from "../template1/template1";
 import jsPDF from "jspdf";
 import html2canvas from "html2canvas";
-import { Document, Page, pdfjs } from "react-pdf";
+import { pdfjs } from "react-pdf";
 import Template2 from "../template2/template2";
-import Link from "next/link";
 import Template3 from "../template3/template3";
-
+import { useDispatch } from "react-redux";
+import {
+  deleteResume,
+  setEditState,
+  setFormData,
+} from "@/features/resume/resume.slice";
+import { useNavigate } from "react-router";
+import { redirect } from "next/navigation";
 
 pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.min.js`;
 
 export default function MediaCard({ data }) {
-  console.log('✌️data --->', data);
+  const dispatch = useDispatch();
   const [isOpenModal, setIsOpenModal] = useState(false);
+
   const [pdfUrl, setPdfUrl] = useState(null);
   const reportTemplateRef = useRef(null);
 
@@ -39,25 +46,10 @@ export default function MediaCard({ data }) {
     const imgData = canvas.toDataURL("image/png");
     const pdf = new jsPDF("p", "mm", "a4");
     const pageWidth = pdf.internal.pageSize.getWidth();
-    const pageHeight = pdf.internal.pageSize.getHeight();
-
     const imgWidth = pageWidth;
     const imgHeight = (canvas.height * imgWidth) / canvas.width;
 
-    if (imgHeight > pageHeight) {
-      let heightLeft = imgHeight;
-      let position = 0;
-
-      while (heightLeft > 0) {
-        pdf.addImage(imgData, "PNG", 0, position, imgWidth, imgHeight);
-        heightLeft -= pageHeight;
-        position -= pageHeight;
-
-        if (heightLeft > 0) pdf.addPage();
-      }
-    } else {
-      pdf.addImage(imgData, "PNG", 0, 0, imgWidth, imgHeight);
-    }
+    pdf.addImage(imgData, "PNG", 0, 0, imgWidth, imgHeight);
 
     const pdfBlob = pdf.output("blob");
     const pdfBlobUrl = URL.createObjectURL(pdfBlob);
@@ -98,11 +90,31 @@ export default function MediaCard({ data }) {
           </Typography>
         </CardContent>
         <CardActions>
-          <Button variant="contained" size="small" onClick={() => setIsOpenModal(true)}>
+          <Button
+            variant="contained"
+            size="small"
+            onClick={() => setIsOpenModal(true)}
+          >
             View
           </Button>
-          <Button variant="contained" size="small">Delete</Button>
-          <Button variant="contained" size="small">Edit</Button>
+          <Button
+            variant="contained"
+            size="small"
+            onClick={() => dispatch(deleteResume(data.id))}
+          >
+            Delete
+          </Button>
+          <Button
+            variant="contained"
+            size="small"
+            onClick={() => {
+              dispatch(setEditState(true));
+              dispatch(setFormData(data));
+              redirect("home/resume-details");
+            }}
+          >
+            Edit
+          </Button>
         </CardActions>
       </Card>
 
@@ -113,7 +125,7 @@ export default function MediaCard({ data }) {
         aria-labelledby="modal-modal-title"
         aria-describedby="modal-modal-description"
       >
-        <Box >
+        <Box>
           {!pdfUrl ? (
             <>
               <Box ref={reportTemplateRef}>
@@ -124,7 +136,6 @@ export default function MediaCard({ data }) {
                 ) : (
                   <Template3 data={data} />
                 )}
-
               </Box>
               <Button
                 variant="contained"
@@ -137,9 +148,7 @@ export default function MediaCard({ data }) {
           ) : (
             <>
               <Typography variant="h6">PDF Preview</Typography>
-              <Document file={pdfUrl}>
-                <Page pageNumber={1} />
-              </Document>
+
               <Button
                 variant="contained"
                 sx={{ color: "white", margin: "10px" }}
@@ -159,14 +168,18 @@ export default function MediaCard({ data }) {
               >
                 Download PDF
               </Button>
-
             </>
           )}
-          <Button variant="contained" sx={{ color: "white", margin: "10px" }} onClick={handleCloseModal}>
+          <Button
+            variant="contained"
+            sx={{ color: "white", margin: "10px" }}
+            onClick={handleCloseModal}
+          >
             Close
           </Button>
         </Box>
       </Modal>
+      
     </>
   );
 }

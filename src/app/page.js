@@ -9,21 +9,17 @@ import { useDispatch } from "react-redux";
 import { loginUser } from "@/features/auth/auth.slice";
 import { toast } from "react-toastify";
 import { redirect } from "next/navigation";
+import { enqueueSnackbar, SnackbarProvider } from "notistack";
 
 export default function Home() {
-
   const dispatch = useDispatch();
 
   function googleAuthentication() {
-    console.log(process.env.NEXT_PUBLIC_FIREBASE_API_KEY);
-
     try {
       const provider = new GoogleAuthProvider();
       signInWithPopup(auth, provider).then((result) => {
         if (result.user) {
-          toast.success("User successfuly signup!", {
-            position: "top-center",
-          });
+          enqueueSnackbar('I love hooks')
           dispatch(
             loginUser({
               email: result.user.email,
@@ -46,45 +42,50 @@ export default function Home() {
   }
 
   return (
-    <Box className={style.container}>
-      <Box className={style["login-container"]}>
-        <Box className={style["left-container"]}>
-          <Typography
-            variant="h2"
-            sx={{ marginBottom: "10px", color: "#424242" }}
-          >
-            Resume Builder
-          </Typography>
-          <Typography
-            variant="h6"
-            sx={{ marginBottom: "10px", color: "#424242" }}
-          >
-            Create your resume in minutes
-          </Typography>
-        </Box>
-
-        <Box className={style["right-container"]}>
-          <Typography
-            variant="h4"
-            sx={{ marginBottom: "10px", color: "#424242" }}
-          >
-            Sign In
-          </Typography>
-
-          <Box className={style["login-button"]} onClick={googleAuthentication}>
-            <Image
-              src={google}
-              alt="google"
-              height={"100%"}
-              width={"100%"}
-              style={{ margin: "0 10px" }}
-            ></Image>
-            <Typography sx={{ margin: "0 10px" }}>
-              Sign in with Google
+    <SnackbarProvider>
+      <Box className={style.container}>
+        <Box className={style["login-container"]}>
+          <Box className={style["left-container"]}>
+            <Typography
+              variant="h2"
+              sx={{ marginBottom: "10px", color: "#424242" }}
+            >
+              Resume Builder
             </Typography>
+            <Typography
+              variant="h6"
+              sx={{ marginBottom: "10px", color: "#424242" }}
+            >
+              Create your resume in minutes
+            </Typography>
+          </Box>
+
+          <Box className={style["right-container"]}>
+            <Typography
+              variant="h4"
+              sx={{ marginBottom: "10px", color: "#424242" }}
+            >
+              Sign In
+            </Typography>
+
+            <Box
+              className={style["login-button"]}
+              onClick={googleAuthentication}
+            >
+              <Image
+                src={google}
+                alt="google"
+                height={"100%"}
+                width={"100%"}
+                style={{ margin: "0 10px" }}
+              ></Image>
+              <Typography sx={{ margin: "0 10px" }}>
+                Sign in with Google
+              </Typography>
+            </Box>
           </Box>
         </Box>
       </Box>
-    </Box>
+    </SnackbarProvider>
   );
 }

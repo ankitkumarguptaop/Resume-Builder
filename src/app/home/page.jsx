@@ -13,6 +13,7 @@ import { useDispatch, useSelector } from "react-redux";
 import MediaCard from "@/components/card/card";
 import { redirect } from "next/navigation";
 import { setCurrentResumeType } from "@/features/resume/resume.slice";
+import { Repeat } from "@mui/icons-material";
 
 
 const Home = () => {
@@ -24,7 +25,6 @@ const Home = () => {
   );
 
   const resumes = useSelector((state) => state.resume.resumes);
-  console.log("✌️currentResume --->", resumes);
 
   const modalStyle = {
     top: "50%",
@@ -63,8 +63,9 @@ const Home = () => {
         onClick={() => setIsOpenModal(true)}
       ></CreateIcon>
 
-      {resumes?.map((resume,index) => (
-        <MediaCard key={index} data={resume}></MediaCard>
+      {resumes?.map((resume,index) => (<Box   key={resume.id}  sx={{display:"flex" ,width:"100vw"}}>
+        <MediaCard data={resume}></MediaCard>
+        </Box>
       ))}
 
       <Modal
